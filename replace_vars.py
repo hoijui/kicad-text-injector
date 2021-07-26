@@ -6,6 +6,7 @@ import abc
 import re
 import sys
 from string import Template
+
 import click
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])

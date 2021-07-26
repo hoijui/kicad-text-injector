@@ -2,15 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from string import Template
 import re
 import os
 import sys
-import click
-from git import Repo
-import replace_vars
 from datetime import date
 from pathlib import Path
+
+import click
+from git import Repo
+
+import replace_vars
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DATE_FORMAT="%Y-%m-%d"
