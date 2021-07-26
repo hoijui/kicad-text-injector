@@ -10,6 +10,7 @@ from pathlib import Path
 
 import click
 from git import Repo
+import pcbnew
 
 import replace_vars
 
@@ -122,7 +123,16 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
     additional_replacements.setdefault('PROJECT_VERSION_DATE', version_date)
     additional_replacements.setdefault('PROJECT_BUILD_DATE', build_date)
     additional_replacements.setdefault('SOURCE_FILE_PATH', src_file_path)
-    replace_vars.replace_vars_by_lines_in_stream(
+    if kicad_pcb:
+        pcb = pcbnew.LoadBoard(src.name)
+        filters = replace_vars.replacements_to_filters(additional_replacements, pre_filter, post_filter)
+        for drawing in pcb.GetDrawings():
+            if drawing.GetClass() == "PTEXT":
+                drawing.SetText(replace_vars.filter_string(drawing.GetText(),
+                    filters, dry, verbose))
+        pcbnew.SaveBoard(dst.name, pcb)
+    else:
+        replace_vars.replace_vars_by_lines_in_stream(
             src, dst, additional_replacements, dry, verbose,
             pre_filter=pre_filter, post_filter=post_filter)
 

@@ -106,8 +106,7 @@ def replace_vars_by_lines(in_file, out_file, replacements, dry=False,
             replace_vars_by_lines_in_stream(src, dst, replacements, dry,
                     verbose, pre_filter, post_filter)
 
-def replace_vars_by_lines_in_stream(fp_in, fp_out, replacements, dry=False,
-        verbose=False, pre_filter=None, post_filter=None) -> None:
+def replacements_to_filters(replacements, pre_filter=None, post_filter=None) -> list:
     if not replacements:
         print('WARNING: No replacements supplied!', file=sys.stderr)
     filters = []
@@ -116,6 +115,13 @@ def replace_vars_by_lines_in_stream(fp_in, fp_out, replacements, dry=False,
     filters.append(TemplateFilter(TemplatePedanticBash, replacements))
     if post_filter:
         filters.append(post_filter)
+    return filters
+
+def replace_vars_by_lines_in_stream(fp_in, fp_out, replacements, dry=False,
+        verbose=False, pre_filter=None, post_filter=None) -> None:
+    if not replacements:
+        print('WARNING: No replacements supplied!', file=sys.stderr)
+    filters = replacements_to_filters(replacements, pre_filter, post_filter)
     filter_stream(fp_in, fp_out, filters, dry, verbose)
 
 def filter_stream(fp_in, fp_out, filters=[], dry=False, verbose=False) -> None:
@@ -129,6 +135,17 @@ def filter_stream(fp_in, fp_out, filters=[], dry=False, verbose=False) -> None:
             for fltr in filters:
                 line = fltr.filter(line)
             fp_out.write(line)
+
+def filter_string(text, filters=[], dry=False, verbose=False) -> str:
+    if not filters:
+        print('WARNING: No filters supplied!', file=sys.stderr)
+    if verbose:
+        for fltr in filters:
+            print(fltr.describe_intent(), file=sys.stderr)
+    if not dry:
+        for fltr in filters:
+            text = fltr.filter(text)
+    return text
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("src", type=click.File("r"))
