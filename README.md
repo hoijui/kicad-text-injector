@@ -4,48 +4,30 @@ SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+# KiCad text injector
+
 [![License: GPL-3.0-or-later](
-https://img.shields.io/badge/License-GPL_3-blue.svg)](
+https://img.shields.io/badge/License-GPL%203.0+-blue.svg)](
 https://www.gnu.org/licenses/gpl-3.0.html)
 [![REUSE status](
-https://api.reuse.software/badge/github.com/osegermany/kicad-pcb-generate-doc-tool)](
-https://api.reuse.software/info/github.com/osegermany/kicad-pcb-generate-doc-tool)
+https://api.reuse.software/badge/github.com/hoijui/kicad-text-injector)](
+https://api.reuse.software/info/github.com/hoijui/kicad-text-injector)
 
-# DEPRECATION Warning
+This tool allows you to post-process your KiCad PCB files,
+by replacing variables of the type `${NAME}` in your text elements.
 
-We recommend to use the formidable
-**[KiBot](https://github.com/INTI-CMNB/KiBot) tool** instead.
+You may put placeholder text onto your PCB -
+for example `${PROJECT_REPO_URL}` -
+on any layer, and this tool then fills in the actual value,
+for example `https://github.com/myorg/myproj`.
+This is most useful for filling in project-specific meta-data into the final output,
+and thus this tool is primarily targeting CI jobs,
+though it can also be run locally.
 
-It can generate much more then just Gerbers
-and 2D renders of the PCBs.
+## Dependencies
 
-## Introduction
-
-These are scripts to help you generate files
-out of [KiCad](https://kicad-pcb.org/) (electronics) projects.
-
-More specifically, it allows you to generate:
-
-* [Gerber](https://en.wikipedia.org/wiki/Gerber_format)
-  & [drill](https://en.wikipedia.org/wiki/PCB_NC_formats) files
-* PNG renders of the PCB (made from the Gerber & drill files)
-
-## Why should I use this?
-
-If you host your KiCad based electronics designs in a git repo,
-you may be storing the generated files in the repo as well.
-That however, comes with the following drawbacks:
-
-* the repo size increases unnecessarily,
-  especially with binary files like PNGs
-* when accessing the repo,
-  one never knows if the generated files
-  are really generated from the latest version of the sources
-
-When able to auto-generate these files,
-one can do it in a CI job
-(available to every repo on GitHub and GitLab out of the box),
-and refer to the generated file on the projects *pages* site.
+* Python 3
+* BASH
 
 ## How does it work?
 
@@ -60,7 +42,7 @@ on a regular Debian based Linux,
 you can install all of this with:
 
 ```bash
-sudo apt-get install bash python3-pip
+sudo apt-get install bash git python3-pip
 pip install pcb-tools
 ```
 
@@ -73,7 +55,7 @@ you would do this to install this tool (in the project root dir):
 ```bash
 pip install pcb-tools
 mkdir -p doc-tools
-git submodule add https://github.com/osegermany/kicad-pcb-generate-doc-tool.git doc-tools/kicad-pcb-generate
+git submodule add https://github.com/hoijui/kicad-text-injector.git doc-tools/kicad-text-injector
 ```
 
 > **NOTE**\
@@ -85,8 +67,19 @@ git submodule add https://github.com/osegermany/kicad-pcb-generate-doc-tool.git 
 This will generate the PCB derived artifacts for all KiCad PCBs in the repo:
 
 ```bash
-doc-tools/kicad-pcb-generate/generate_sources
-doc-tools/kicad-pcb-generate/generate_output
+doc-tools/kicad-text-injector/generate_sources
 ```
 
 Output can be found under the *build* directory.
+
+## Misc
+
+We very warmly recommend you to use
+**the [KiBot](https://github.com/INTI-CMNB/KiBot) tool**
+for the actual generation of the final output
+from the post-processed KiCad sources.
+It can generate much more then just Gerbers
+and 2D renders of the PCBs.
+
+Also see the [KiCad image/QRCode injector](https://github.com/hoijui/kicad-image-injector).
+
