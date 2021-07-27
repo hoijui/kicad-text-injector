@@ -196,10 +196,14 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
         post_filter = None
         pcb = pcbnew.LoadBoard(src.name)
         filters = replace_vars.replacements_to_filters(additional_replacements, pre_filter, post_filter)
+        verbose_loop = verbose
         for drawing in pcb.GetDrawings():
             if drawing.GetClass() == "PTEXT":
                 drawing.SetText(replace_vars.filter_string(drawing.GetText(),
-                    filters, dry, verbose))
+                    filters, dry, verbose_loop))
+                # As all the text fields use the same set of replacements,
+                # we at most want to print them once
+                verbose_loop = False
         pcbnew.SaveBoard(dst.name, pcb)
     else:
         replace_vars.replace_vars_by_lines_in_stream(
