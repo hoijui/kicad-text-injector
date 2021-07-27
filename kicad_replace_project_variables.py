@@ -16,6 +16,7 @@ import replace_vars
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 DATE_FORMAT="%Y-%m-%d"
+R_DIRTY_VERSION = re.compile(".*-dirty(-.*)?$")
 
 # Quotes all KiCad text entries that are not yet quoted and contain a variable of the form '${KEY}'
 filter_kicad_quote   = replace_vars.RegexTextFilter(
@@ -36,6 +37,16 @@ def git_remote_to_https_url(url) -> str:
     public_url = public_url.replace(".com:", ".com/", 1)
     public_url = re.sub(r"\.git$", "", public_url)
     return public_url
+
+def isDirtyVersion(vers) -> bool:
+    return R_DIRTY_VERSION.match(vers) # TODO check if correct
+
+def test_isDirtyVersion():
+    assert(not isDirtyVersion('myProj-1.2.3'))
+    assert(not isDirtyVersion('myProj-1.2.3dirty'))
+    assert(not isDirtyVersion('myProj-1.2.3-dirtybroken'))
+    assert(isDirtyVersion('myProj-1.2.3-dirty'))
+    assert(isDirtyVersion('myProj-1.2.3-dirty-broken'))
 
 def convertTupleToDict(tpl) -> dict:
     dct = {}
@@ -154,6 +165,8 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
         vers = repo.git.describe('--tags', '--dirty', '--broken', '--always')
     if version_date is None:
         version_date = date.fromtimestamp(repo.head.ref.commit.committed_date).strftime(date_format)
+    if isDirtyVersion(vers):
+        print(f"WARNING: Dirty project version ('{vers}')! (you have uncommitted changes in your project)")
     if build_date is None:
         build_date = date.today().strftime(date_format)
     if src_file_path is None:
@@ -326,3 +339,4 @@ def replace_recursive(src_root='.', glob='*.kicad_pcb', dst_root=None,
 if __name__ == '__main__':
     replace_single_command()
     #replace_recursive_command()
+    #test_isDirtyVersion()
