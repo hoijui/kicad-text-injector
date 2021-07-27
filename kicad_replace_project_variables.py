@@ -97,8 +97,6 @@ def convertTupleToDict(tpl) -> dict:
         help=('Date at which the currently being-made build of '
             + 'the project is made. This should basically always be left on the '
             + 'default, which is the current date.'))
-#@click.option('--recursive', '-R', type=click.STRING, default=None,
-#       help='If --src-file-path points to a directory, and this is a globWhether to skip the actual replacing')
 @click.option('--date-format',
         type=click.STRING,
         default=DATE_FORMAT,
