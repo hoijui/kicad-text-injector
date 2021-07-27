@@ -37,6 +37,12 @@ def git_remote_to_https_url(url) -> str:
     public_url = re.sub(r"\.git$", "", public_url)
     return public_url
 
+def convertTupleToDict(tpl) -> dict:
+    dct = {}
+    for key, value in tpl:
+        dct[key] = value
+    return dct
+
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("src", type=click.File("r"))
 @click.argument("dst", type=click.File("w"))
@@ -121,10 +127,7 @@ def replace_single_command(src, dst, additional_replacements, src_file_path=None
     ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair,
     using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
-    # convert tuple to dict
-    add_repls_dict = {}
-    for key, value in additional_replacements:
-        add_repls_dict[key] = value
+    add_repls_dict = convertTupleToDict(additional_replacements)
     replace_single(src, dst, add_repls_dict, src_file_path, repo_path,
             repo_url, name, vers, version_date, build_date,
             date_format, kicad_pcb, dry, verbose)
