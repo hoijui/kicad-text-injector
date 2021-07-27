@@ -41,30 +41,61 @@ def git_remote_to_https_url(url) -> str:
 @click.argument("src", type=click.File("r"))
 @click.argument("dst", type=click.File("w"))
 @click.argument("additional_replacements", type=replace_vars.KEY_VALLUE_PAIR, nargs=-1)
-@click.option('--src-file-path', '-p', type=click.Path(dir_okay=False, file_okay=True), envvar='PROJECT_SRC_FILE_PATH',
-        default=None, help='The path to the source file, relative to the repo root. This is only used in variable substitution; no reading from that path will be attempted. (default: SRC)')
-@click.option('--repo-path', '-r', type=click.Path(dir_okay=True, file_okay=False), envvar='PROJECT_REPO_PATH',
-        default='.', help='The path to the local git repo')
-@click.option('--repo-url', '-u', type=click.STRING, envvar='PROJECT_REPO_URL',
-        default=None, help='Public project repo URL')
-@click.option('-n', '--name', type=click.STRING, envvar='PROJECT_NAME',
-        default=None, help='Project name (prefferably without spaces)')
-@click.option('--vers', type=click.STRING, envvar='PROJECT_VERSION',
-        default=None, help='Project version (prefferably without spaces)')
-@click.option('-d', '--version-date', type=click.STRING, envvar='PROJECT_VERSION_DATE',
-        default=None, help='Date at which this version of the project was committed/released')
-@click.option('--build-date', type=click.STRING, envvar='PROJECT_BUILD_DATE',
-        default=None, help=('Date at which the currently being-made build of '
+@click.option('--src-file-path', '-p',
+        type=click.Path(dir_okay=False, file_okay=True),
+        envvar='PROJECT_SRC_FILE_PATH',
+        default=None,
+        help='The path to the source file, relative to the repo root. '
+            + 'This is only used in variable substitution; '
+            + 'no reading from that path will be attempted. (default: SRC)')
+@click.option('--repo-path', '-r',
+        type=click.Path(dir_okay=True, file_okay=False),
+        envvar='PROJECT_REPO_PATH',
+        default='.',
+        help='The path to the local git repo')
+@click.option('--repo-url', '-u',
+        type=click.STRING,
+        envvar='PROJECT_REPO_URL',
+        default=None,
+        help='Public project repo URL')
+@click.option('-n', '--name',
+        type=click.STRING,
+        envvar='PROJECT_NAME',
+        default=None,
+        help='Project name (prefferably without spaces)')
+@click.option('--vers',
+        type=click.STRING,
+        envvar='PROJECT_VERSION',
+        default=None,
+        help='Project version (prefferably without spaces)')
+@click.option('-d', '--version-date',
+        type=click.STRING,
+        envvar='PROJECT_VERSION_DATE',
+        default=None,
+        help='Date at which this version of the project was committed/released')
+@click.option('--build-date',
+        type=click.STRING,
+        envvar='PROJECT_BUILD_DATE',
+        default=None,
+        help=('Date at which the currently being-made build of '
             + 'the project is made. This should basically always be left on the '
             + 'default, which is the current date.'))
 #@click.option('--recursive', '-R', type=click.STRING, default=None,
 #       help='If --src-file-path points to a directory, and this is a globWhether to skip the actual replacing')
-@click.option('--date-format', type=click.STRING, default=DATE_FORMAT,
+@click.option('--date-format',
+        type=click.STRING,
+        default=DATE_FORMAT,
         help=('The format for the version and the build dates; '
             + 'see pythons date.strftime documentation'))
-@click.option('--kicad-pcb', is_flag=True, help='Whether the filtered file is a *.kicab_pcb')
-@click.option('--dry', is_flag=True, help='Whether to skip the actual replacing')
-@click.option('--verbose', is_flag=True, help='Whether to output additional info to stderr')
+@click.option('--kicad-pcb',
+        is_flag=True,
+        help='Whether the filtered file is a *.kicab_pcb')
+@click.option('--dry',
+        is_flag=True,
+        help='Whether to skip the actual replacing')
+@click.option('--verbose',
+        is_flag=True,
+        help='Whether to output additional info to stderr')
 def replace_single_command(src, dst, additional_replacements, src_file_path=None, repo_path='.',
         repo_url=None, name=None, vers=None, version_date=None, build_date=None,
         date_format=DATE_FORMAT, kicad_pcb=False, dry=False,
@@ -82,11 +113,13 @@ def replace_single_command(src, dst, additional_replacements, src_file_path=None
 
     * directly specified through `ADDITIONAL_REPLACEMENTS`, for example `"PROJECT_BATCH_ID=john-1"`
 
-    SRC - The source KiCad PCB file (this will be used as input, and potentially for the replacement variable `${PROJECT_SRC_FILE_PATH}`).
+    SRC - The source KiCad PCB file (this will be used as input,
+    and potentially for the replacement variable `${PROJECT_SRC_FILE_PATH}`).
 
     DST - The destination KiCad PCB file (this will be used for the generated output).
 
-    ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair, using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
+    ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair,
+    using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
     # convert tuple to dict
     add_repls_dict = {}
@@ -155,35 +188,64 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
             src, dst, additional_replacements, dry, verbose,
             pre_filter=pre_filter, post_filter=post_filter)
 
-
-
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument("src_root", type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True))
 @click.argument("glob", type=click.STRING)
 @click.argument("dst_root", type=click.Path(exists=True, dir_okay=True, file_okay=False, writable=True))
 @click.argument("additional_replacements", type=replace_vars.KEY_VALLUE_PAIR, nargs=-1)
-@click.option('--src-file-path', '-p', type=click.Path(dir_okay=False, file_okay=True), envvar='PROJECT_SRC_FILE_PATH',
-        default=None, help='The path to the source file, relative to the repo root. This is only used in variable substitution; no reading from that path will be attempted. (default: SRC)')
-@click.option('--repo-path', '-r', type=click.Path(dir_okay=True, file_okay=False), envvar='PROJECT_REPO_PATH',
-        default='.', help='The path to the local git repo')
-@click.option('--repo-url', '-u', type=click.STRING, envvar='PROJECT_REPO_URL',
-        default=None, help='Public project repo URL')
-@click.option('-n', '--name', type=click.STRING, envvar='PROJECT_NAME',
-        default=None, help='Project name (prefferably without spaces)')
-@click.option('--vers', type=click.STRING, envvar='PROJECT_VERSION',
-        default=None, help='Project version (prefferably without spaces)')
-@click.option('-d', '--version-date', type=click.STRING, envvar='PROJECT_VERSION_DATE',
-        default=None, help='Date at which this version of the project was committed/released')
-@click.option('--build-date', type=click.STRING, envvar='PROJECT_BUILD_DATE',
-        default=None, help='Date at which the currently being-made build of the project is made.' +
-        ' This should basically always be left on the default, which is the current date.')
+@click.option('--src-file-path', '-p',
+        type=click.Path(dir_okay=False, file_okay=True),
+        envvar='PROJECT_SRC_FILE_PATH',
+        default=None,
+        help='The path to the source file, relative to the repo root. '
+            + 'This is only used in variable substitution; '
+            + 'no reading from that path will be attempted. (default: SRC)')
+@click.option('--repo-path', '-r',
+        type=click.Path(dir_okay=True, file_okay=False),
+        envvar='PROJECT_REPO_PATH',
+        default='.',
+        help='The path to the local git repo')
+@click.option('--repo-url', '-u',
+        type=click.STRING,
+        envvar='PROJECT_REPO_URL',
+        default=None,
+        help='Public project repo URL')
+@click.option('-n', '--name',
+        type=click.STRING,
+        envvar='PROJECT_NAME',
+        default=None,
+        help='Project name (prefferably without spaces)')
+@click.option('--vers',
+        type=click.STRING,
+        envvar='PROJECT_VERSION',
+        default=None,
+        help='Project version (prefferably without spaces)')
+@click.option('-d', '--version-date',
+        type=click.STRING,
+        envvar='PROJECT_VERSION_DATE',
+        default=None,
+        help='Date at which this version of the project was committed/released')
+@click.option('--build-date',
+        type=click.STRING,
+        envvar='PROJECT_BUILD_DATE',
+        default=None,
+        help='Date at which the currently being-made build of the project is made.'
+            + ' This should basically always be left on the default, which is the current date.')
 #@click.option('--recursive', '-R', type=click.STRING, default=None,
 #       help='If --src-file-path points to a directory, and this is a globWhether to skip the actual replacing')
-@click.option('--date-format', type=click.STRING, default=DATE_FORMAT,
+@click.option('--date-format',
+        type=click.STRING,
+        default=DATE_FORMAT,
         help='The format for the version and the build dates; see pythons date.strftime documentation')
-@click.option('--kicad-pcb', is_flag=True, help='Whether the filtered file is a *.kicab_pcb')
-@click.option('--dry', is_flag=True, help='Whether to skip the actual replacing')
-@click.option('--verbose', is_flag=True, help='Whether to output additional info to stderr')
+@click.option('--kicad-pcb',
+        is_flag=True,
+        help='Whether the filtered file is a *.kicab_pcb')
+@click.option('--dry',
+        is_flag=True,
+        help='Whether to skip the actual replacing')
+@click.option('--verbose',
+        is_flag=True,
+        help='Whether to output additional info to stderr')
 def replace_recursive_command(src_root='.', glob='*.kicad_pcb', dst_root='./build/gen-src',
         additional_replacements=(), src_file_path=None, repo_path='.',
         repo_url=None, name=None, vers=None, version_date=None, build_date=None,
@@ -204,11 +266,13 @@ def replace_recursive_command(src_root='.', glob='*.kicad_pcb', dst_root='./buil
 
     Use `$${KEY}` for quoting variables you do not want expanded.
 
-    SRC - The source KiCad PCB file (this will be used as input, and potentially for the replacement variable `${PROJECT_SRC_FILE_PATH}`).
+    SRC - The source KiCad PCB file (this will be used as input,
+    and potentially for the replacement variable `${PROJECT_SRC_FILE_PATH}`).
 
     DST - The destination KiCad PCB file (this will be used for the generated output).
 
-    ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair, using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
+    ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair,
+    using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
     add_repls_dict = {}
     for key, value in additional_replacements:
