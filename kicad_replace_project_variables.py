@@ -69,6 +69,25 @@ def replace_single_command(src, dst, additional_replacements, src_file_path=None
         repo_url=None, name=None, vers=None, version_date=None, build_date=None,
         date_format=DATE_FORMAT, kicad_pcb=False, dry=False,
         verbose=False) -> None:
+    '''
+    Using a KiCad PCB file as input,
+    replaces variables of the type `${VAR_NAME}` in text-fields with actual values,
+    writing the result to an other KiCad PCB file.
+
+    Key-value pairs to be used for the replacement are collected from 3 sources:
+
+    * read from common environment variables like `PROJECT_REPO_PATH` and `PROJECT_REPO_URL`
+
+    * specified through command-line switches like `--repo-url "https://github.com/user/repo/"`
+
+    * directly specified through `ADDITIONAL_REPLACEMENTS`, for example `"PROJECT_BATCH_ID=john-1"`
+
+    SRC - The source KiCad PCB file (this will be used as input, and potentially for the replacement variable `${PROJECT_SRC_FILE_PATH}`).
+
+    DST - The destination KiCad PCB file (this will be used for the generated output).
+
+    ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair, using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
+    '''
     # convert tuple to dict
     add_repls_dict = {}
     for key, value in additional_replacements:
@@ -171,11 +190,25 @@ def replace_recursive_command(src_root='.', glob='*.kicad_pcb', dst_root='./buil
         date_format=DATE_FORMAT, kicad_pcb=False, dry=False,
         verbose=False) -> None:
     '''
-    Replaces template values, generating a KiCad PCB file,
-    with a KiCad PCB file as input.
-    Scanns for all *.kicad_pcb files in the project,
-    and replaces variables of the form ${KEY} in there.
-    Use $${KEY} for quoting variables you do not want expanded.
+    Scanns for all *.kicad_pcb files in the SRC_ROOT directory,
+    replaces variables of the type `${VAR_NAME}` in text-fields with actual values,
+    and writes the resulting PCB to the DST_ROOT, using the same sub-path.
+
+    Key-value pairs to be used for the replacement are collected from 3 sources:
+
+    * read from common environment variables like `PROJECT_REPO_PATH` and `PROJECT_REPO_URL`
+
+    * specified through command-line switches like `--repo-url "https://github.com/user/repo/"`
+
+    * directly specified through `ADDITIONAL_REPLACEMENTS`, for example `"PROJECT_BATCH_ID=john-1"`
+
+    Use `$${KEY}` for quoting variables you do not want expanded.
+
+    SRC - The source KiCad PCB file (this will be used as input, and potentially for the replacement variable `${PROJECT_SRC_FILE_PATH}`).
+
+    DST - The destination KiCad PCB file (this will be used for the generated output).
+
+    ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair, using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
     add_repls_dict = {}
     for key, value in additional_replacements:
