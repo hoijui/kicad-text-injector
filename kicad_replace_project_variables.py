@@ -190,6 +190,10 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
     additional_replacements.setdefault('PROJECT_BUILD_DATE', build_date)
     additional_replacements.setdefault('SOURCE_FILE_PATH', src_file_path)
     if kicad_pcb:
+        # As we are not dealing with the (Lisp-like), raw KiCad PCB (PCBnew) syntax here,
+        # but just with the actual text, we do not require pre- and post-fitlering.
+        pre_filter = None
+        post_filter = None
         pcb = pcbnew.LoadBoard(src.name)
         filters = replace_vars.replacements_to_filters(additional_replacements, pre_filter, post_filter)
         for drawing in pcb.GetDrawings():
