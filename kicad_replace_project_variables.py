@@ -42,7 +42,7 @@ def git_remote_to_https_url(url) -> str:
 @click.argument("dst", type=click.File("w"))
 @click.argument("additional_replacements", type=replace_vars.KEY_VALLUE_PAIR, nargs=-1)
 @click.option('--src-file-path', '-p', type=click.Path(), envvar='PROJECT_SRC_FILE_PATH',
-        default=None, help='The path to the source file, relative to the repo root')
+        default=None, help='The path to the source file, relative to the repo root. This is only used in variable substitution; no reading from that path will be attempted. (default: SRC)')
 @click.option('--repo-path', '-r', type=click.Path(), envvar='PROJECT_REPO_PATH',
         default='.', help='The path to the local git repo')
 @click.option('--repo-url', '-u', type=click.STRING, envvar='PROJECT_REPO_URL',
@@ -144,7 +144,7 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
 @click.argument("dst_root", type=click.Path(exists=True, dir_okay=True, writable=True))
 @click.argument("additional_replacements", type=replace_vars.KEY_VALLUE_PAIR, nargs=-1)
 @click.option('--src-file-path', '-p', type=click.Path(), envvar='PROJECT_SRC_FILE_PATH',
-        default=None, help='The path to the source file, relative to the repo root')
+        default=None, help='The path to the source file, relative to the repo root. This is only used in variable substitution; no reading from that path will be attempted. (default: SRC)')
 @click.option('--repo-path', '-r', type=click.Path(), envvar='PROJECT_REPO_PATH',
         default='.', help='The path to the local git repo')
 @click.option('--repo-url', '-u', type=click.STRING, envvar='PROJECT_REPO_URL',
