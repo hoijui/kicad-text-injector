@@ -168,7 +168,7 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
     if build_date is None:
         build_date = date.today().strftime(date_format)
     if src_file_path is None:
-        src_file_path = src.name
+        src_file_path = os.path.relpath(src.name, repo_path)
     if src_file_path == '-':
         print('WARNING: "src_file_path" has the generic value "%s"'
                 % src_file_path, file=sys.stderr)
