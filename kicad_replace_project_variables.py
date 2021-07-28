@@ -137,14 +137,29 @@ def replace_single_command(src, dst, additional_replacements, src_file_path=None
     using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
     add_repls_dict = convertTupleToDict(additional_replacements)
+    prepare_project_vars(
+        add_repls_dict,
+        repo_path,
+        repo_url,
+        name,
+        vers,
+        version_date,
+        build_date,
+        date_format,
+        verbose)
     replace_single(src, dst, add_repls_dict, src_file_path, repo_path,
-            repo_url, name, vers, version_date, build_date,
-            date_format, kicad_pcb, dry, verbose)
+            kicad_pcb, dry, verbose)
 
-def replace_single(src, dst, additional_replacements={}, src_file_path=None, repo_path='.',
-        repo_url=None, name=None, vers=None, version_date=None, build_date=None,
-        date_format=DATE_FORMAT, kicad_pcb=False, dry=False,
-        verbose=False) -> None:
+def prepare_project_vars(
+        vars: dict,
+        repo_path,
+        repo_url,
+        name,
+        vers,
+        version_date,
+        build_date,
+        date_format,
+        verbose) -> None:
     repo = Repo(repo_path)
     vcs_branch = repo.head.reference
     vcs_remote_tracking_branch = vcs_branch.tracking_branch()
@@ -167,11 +182,27 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
         print(f"WARNING: Dirty project version ('{vers}')! (you have uncommitted changes in your project)")
     if build_date is None:
         build_date = date.today().strftime(date_format)
+    vars.setdefault('PROJECT_REPO_URL', repo_url)
+    vars.setdefault('PROJECT_NAME', name)
+    vars.setdefault('PROJECT_VERSION', vers)
+    vars.setdefault('PROJECT_VERSION_DATE', version_date)
+    vars.setdefault('PROJECT_BUILD_DATE', build_date)
+
+def replace_single(
+        src,
+        dst,
+        replacements={},
+        src_file_path=None,
+        repo_path='.',
+        kicad_pcb=False,
+        dry=False,
+        verbose=False) -> None:
     if src_file_path is None:
         src_file_path = os.path.relpath(src.name, repo_path)
     if src_file_path == '-':
         print('WARNING: "src_file_path" has the generic value "%s"'
                 % src_file_path, file=sys.stderr)
+    replacements.setdefault('SOURCE_FILE_PATH', src_file_path)
     if not kicad_pcb and src_file_path and src_file_path.endswith(".kicad_pcb"):
         kicad_pcb=True
         print('WARNING: Automatically set kicad_pcb=True due to appropriate file-suffix',
@@ -183,19 +214,13 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
         post_filter=filter_kicad_unquote
         if verbose:
             print('INFO: KiCad PCB filters will be applied', file=sys.stderr)
-    additional_replacements.setdefault('PROJECT_REPO_URL', repo_url)
-    additional_replacements.setdefault('PROJECT_NAME', name)
-    additional_replacements.setdefault('PROJECT_VERSION', vers)
-    additional_replacements.setdefault('PROJECT_VERSION_DATE', version_date)
-    additional_replacements.setdefault('PROJECT_BUILD_DATE', build_date)
-    additional_replacements.setdefault('SOURCE_FILE_PATH', src_file_path)
     if kicad_pcb:
         # As we are not dealing with the (Lisp-like), raw KiCad PCB (PCBnew) syntax here,
         # but just with the actual text, we do not require pre- and post-fitlering.
         pre_filter = None
         post_filter = None
         pcb = pcbnew.LoadBoard(src.name)
-        filters = replace_vars.replacements_to_filters(additional_replacements, pre_filter, post_filter)
+        filters = replace_vars.replacements_to_filters(replacements, pre_filter, post_filter)
         verbose_loop = verbose
         for drawing in pcb.GetDrawings():
             if drawing.GetClass() == "PTEXT":
@@ -207,7 +232,7 @@ def replace_single(src, dst, additional_replacements={}, src_file_path=None, rep
         pcbnew.SaveBoard(dst.name, pcb)
     else:
         replace_vars.replace_vars_by_lines_in_stream(
-            src, dst, additional_replacements, dry, verbose,
+            src, dst, replacements, dry, verbose,
             pre_filter=pre_filter, post_filter=post_filter)
 
 @click.command(context_settings=CONTEXT_SETTINGS)
