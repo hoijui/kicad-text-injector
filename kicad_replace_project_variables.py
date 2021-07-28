@@ -321,17 +321,23 @@ def replace_recursive_command(src_root='.', glob='*.kicad_pcb', dst_root='./buil
     ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair,
     using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
-    add_repls_dict = {}
-    for key, value in additional_replacements:
-        add_repls_dict[key] = value
+    add_repls_dict = convertTupleToDict(additional_replacements)
+    prepare_project_vars(
+        add_repls_dict,
+        repo_path,
+        repo_url,
+        name,
+        vers,
+        version_date,
+        build_date,
+        date_format,
+        verbose)
     replace_recursive(src_root, glob, dst_root, add_repls_dict, src_file_path, repo_path,
-            repo_url, name, vers, version_date, build_date,
-            date_format, kicad_pcb, dry, verbose)
+            kicad_pcb, dry, verbose)
 
 def replace_recursive(src_root='.', glob='*.kicad_pcb', dst_root=None,
-        additional_replacements={}, src_file_path=None, repo_path='.',
-        repo_url=None, name=None, vers=None, version_date=None,
-        build_date=None, date_format=DATE_FORMAT, kicad_pcb=False,
+        add_repls_dict={}, src_file_path=None, repo_path='.',
+        kicad_pcb=False,
         dry=False, verbose=False) -> None:
     if src_root == dst_root:
         dst_root = None
@@ -340,9 +346,6 @@ def replace_recursive(src_root='.', glob='*.kicad_pcb', dst_root=None,
     if dst_root:
         dst_root_abs = os.path.abspath(dst_root)
     for path in Path(src_root).rglob(glob):
-        print(str(path), file=sys.stderr)
-        print(str(dst_root_abs), file=sys.stderr)
-        print(str(path.absolute()), file=sys.stderr)
         if dst_root and os.path.commonpath([os.path.abspath(path), dst_root_abs]) == dst_root_abs:
             # Exclude files in the dst_root
             continue
@@ -360,12 +363,10 @@ def replace_recursive(src_root='.', glob='*.kicad_pcb', dst_root=None,
                 print('INFO: Processing file "%s" ...' % src_path, file=sys.stderr)
         src = click.open_file(src_path, "r")
         dst = click.open_file(dst_path, "w")
-        replace_single(src, dst, additional_replacements, src_file_path, repo_path,
-                repo_url, name, vers, version_date, build_date,
-                date_format, kicad_pcb, dry, verbose)
+        replace_single(src, dst, add_repls_dict, src_file_path, repo_path,
+                kicad_pcb, dry, verbose)
         if not dst_root:
             os.rename(dst.name, src.name)
-
 
 if __name__ == '__main__':
     replace_single_command()
