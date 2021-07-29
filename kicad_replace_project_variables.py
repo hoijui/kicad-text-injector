@@ -62,7 +62,7 @@ def is_dirty_version(vers) -> bool:
     Checks whether a given version string is a git dirty version.
     Dirty means, there are uncommitted changes.
     '''
-    return R_DIRTY_VERSION.match(vers) # TODO check if correct
+    return R_DIRTY_VERSION.match(vers)
 
 def test_is_dirty_version():
     '''
