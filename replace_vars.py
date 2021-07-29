@@ -36,7 +36,7 @@ class RegexTextFilter(TextFilter):
         self.search = re.compile(search_p)
         self.repl = repl_p
     def describe_intent(self):
-        return "INFO: replacing (regex): '%s' -> '%s'" % (self.search.pattern, self.repl)
+        return "INFO: Replacing (regex): '%-30s' -> '%s'" % (self.search.pattern, self.repl)
     def filter(self, text):
         return self.search.sub(self.repl, text)
 
@@ -51,7 +51,7 @@ class TemplateFilter(TextFilter):
     def describe_intent(self):
         lines = []
         for key, value in self.replacements.items():
-            lines.append("INFO: replacing (static): '${%s}' -> '%s'" % # FIXME This is not generic yet, but specific to our own filter: TemplatePedanticBash
+            lines.append("INFO: Replacing (fixed): '${%-30s}' -> '%s'" %
                          (key, value))
         return '\n'.join(lines)
     def filter(self, text):
