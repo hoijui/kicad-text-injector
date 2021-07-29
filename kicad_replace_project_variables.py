@@ -57,24 +57,24 @@ def git_remote_to_https_url(url) -> str:
     public_url = re.sub(r"\.git$", "", public_url)
     return public_url
 
-def isDirtyVersion(vers) -> bool:
+def is_dirty_version(vers) -> bool:
     '''
     Checks whether a given version string is a git dirty version.
     Dirty means, there are uncommitted changes.
     '''
     return R_DIRTY_VERSION.match(vers) # TODO check if correct
 
-def test_isDirtyVersion():
+def test_is_dirty_version():
     '''
-    Unit test for the function isDirtyVersion.
+    Unit test for the function is_dirty_version.
     '''
-    assert not isDirtyVersion('myProj-1.2.3')
-    assert not isDirtyVersion('myProj-1.2.3dirty')
-    assert not isDirtyVersion('myProj-1.2.3-dirtybroken')
-    assert isDirtyVersion('myProj-1.2.3-dirty')
-    assert isDirtyVersion('myProj-1.2.3-dirty-broken')
+    assert not is_dirty_version('my_proj-1.2.3')
+    assert not is_dirty_version('my_proj-1.2.3dirty')
+    assert not is_dirty_version('my_proj-1.2.3-dirtybroken')
+    assert is_dirty_version('my_proj-1.2.3-dirty')
+    assert is_dirty_version('my_proj-1.2.3-dirty-broken')
 
-def convertTupleToDict(tpl) -> dict:
+def convert_tuple_to_dict(tpl) -> dict:
     '''
     Converts a key-value pair tuple into a dict,
     for example:
@@ -181,7 +181,7 @@ def replace_single_command(
     ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair,
     using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
-    add_repls_dict = convertTupleToDict(additional_replacements)
+    add_repls_dict = convert_tuple_to_dict(additional_replacements)
     prepare_project_vars(
         add_repls_dict,
         repo_path,
@@ -230,7 +230,7 @@ def prepare_project_vars(
         vers = repo.git.describe('--tags', '--dirty', '--broken', '--always')
     if version_date is None:
         version_date = date.fromtimestamp(repo.head.ref.commit.committed_date).strftime(date_format)
-    if isDirtyVersion(vers):
+    if is_dirty_version(vers):
         print(f"WARNING: Dirty project version ('{vers}')! ' "
                 + "(you have uncommitted changes in your project)")
     if build_date is None:
@@ -388,7 +388,7 @@ def replace_recursive_command(
     ADDITIONAL_REPLACEMENTS - Each one of these is a ful key-value pair,
     using '=' as the delimiter, for example `"PROJECT_BATCH_ID=john-1"`.
     '''
-    add_repls_dict = convertTupleToDict(additional_replacements)
+    add_repls_dict = convert_tuple_to_dict(additional_replacements)
     prepare_project_vars(
         add_repls_dict,
         repo_path,
@@ -456,4 +456,4 @@ def replace_recursive(
 if __name__ == '__main__':
     replace_single_command()
     #replace_recursive_command()
-    #test_isDirtyVersion()
+    #test_is_dirty_version()
