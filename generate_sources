@@ -28,6 +28,8 @@ function print_help() {
 	echo "$APP_NAME - Replaces template values, generating a KiCad PCB file,"
 	echo "with a KiCad PCB file as input."
 	echo "The template keys have to match the whole content of a Text field, exactly."
+	echo "Scanns for all *.kicad_pcb files in the project,"
+	echo "The template keys have to match the whole content of a Text field, exactly."
 	echo
 	echo "Usage:"
 	echo "  $script_name [OPTIONS] <local-repo-dir>"
@@ -125,8 +127,8 @@ fi
 if [[ $project_version = *-dirty ]] || [[ $project_version = *-dirty-* ]]
 then
 	>&2 echo "WARNING: Dirty project version! (you have uncommitted changes in your project)"
-	print_help
-	exit 1
+	#print_help
+	#exit 1
 fi
 if [ -z "$project_version_date" ]
 then
@@ -150,6 +152,7 @@ echo
 # Recursive KiCad PCB file search
 # (with wall-clock time meassurement)
 # (all tracked and untracked, un(git)ignored files
+echo "Processing KiCad PCB files ..."
 #for pcb in {**,.}/*.kicad_pcb
 time \
 	( git -C "$root_dir_abs" status --short \
@@ -182,6 +185,11 @@ do
 		"PROJECT_VERSION_DATE=$project_version_date" \
 		"PROJECT_BUILD_DATE=$project_build_date" \
 		"SOURCE_FILE_PATH=$source_file_path" \
+		"PROJECT_BATCH_ID=hoijui-1" \
+		"PROJECT_MANUFACTURER_SERIAL=JLCJLCJLCJLC" \
+		"PROJECT_MANUFACTURER_NAME=JLCPCB.com" \
+		"PROJECT_LICENSE_NAME=CC-BY-SA 4.0" \
+		"PROJECT_LICENSE_URL=https://creativecommons.org/licenses/by-sa/4.0/" \
 		--verbose
 done
 echo "done."
