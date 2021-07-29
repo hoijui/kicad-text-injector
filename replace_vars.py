@@ -42,8 +42,8 @@ class RegexTextFilter(TextFilter):
 
 class TemplateFilter(TextFilter):
     '''
-        Allows to filter a text with a template;
-        see the string.Template class.
+    Allows to filter a text with a template;
+    see the string.Template class.
     '''
     def __init__(self, template_class, replacements):
         self.template_class = template_class
@@ -61,8 +61,8 @@ class TemplateFilter(TextFilter):
 
 class TemplatePedanticBash(Template):
     '''
-        Replaces only braced identifiers like "${key}" (not "$key").
-        Use "$" in front to escpape, like "$${key}".
+    Replaces only braced identifiers like "${key}" (not "$key").
+    Use "$" in front to escpape, like "$${key}".
     '''
     delimiter = '$'
     pattern = r'''
@@ -76,9 +76,9 @@ class TemplatePedanticBash(Template):
 
 class KeyValuePairType(click.ParamType):
     '''
-        Allows to parse strings into key+value pairs,
-        separated by either ':' or '='.
-        This is for the click command-line parsing lib.
+    Allows to parse strings into key+value pairs,
+    separated by either ':' or '='.
+    This is for the click command-line parsing lib.
     '''
     name = 'key-value-pair'
     sep = None
