@@ -190,8 +190,7 @@ def replace_single_command(
         vers,
         version_date,
         build_date,
-        date_format,
-        verbose)
+        date_format)
     replace_single(
             src,
             dst,
@@ -210,8 +209,7 @@ def prepare_project_vars(
         vers,
         version_date,
         build_date,
-        date_format,
-        verbose) -> None:
+        date_format) -> None:
     repo = Repo(repo_path)
     vcs_branch = repo.head.reference
     vcs_remote_tracking_branch = vcs_branch.tracking_branch()
@@ -397,8 +395,7 @@ def replace_recursive_command(
         vers,
         version_date,
         build_date,
-        date_format,
-        verbose)
+        date_format)
     replace_recursive(
             src_root,
             glob,
