@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+'''
+Utilities for parsing text that contains variables
+of the kind `${KEY}`, and replacing those with actual values.
+There is also code for parsing text consisting of key-value pairs,
+separated eihter by `=` or `:`.
+'''
+
 import abc
 import re
 import sys
@@ -44,7 +51,8 @@ class TemplateFilter(TextFilter):
     def describe_intent(self):
         lines = []
         for key, value in self.replacements.items():
-            lines.append("INFO: replacing (static): '${%s}' -> '%s'" % (key, value)) # FIXME This is not generic yet, but fixed to our own filter: TemplatePedanticBash
+            lines.append("INFO: replacing (static): '${%s}' -> '%s'" % # FIXME This is not generic yet, but specific to our own filter: TemplatePedanticBash
+                         (key, value))
         return '\n'.join(lines)
     def filter(self, text):
         template = self.template_class(text)
@@ -97,16 +105,26 @@ KEY_VALLUE_PAIR = KeyValuePairType()
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option()
 def replace_vars() -> None:
-    pass
+    '''
+    Stub function for module-global click annotations.
+    '''
 
 def replace_vars_by_lines(in_file, out_file, replacements, dry=False,
         verbose=False, pre_filter=None, post_filter=None) -> None:
+    '''
+    Replaces variable keys by their values, one line at a time,
+    reading from one file-path and writing to an other.
+    '''
     with open(in_file, "r") as src:
         with open(out_file, "w") as dst:
             replace_vars_by_lines_in_stream(src, dst, replacements, dry,
                     verbose, pre_filter, post_filter)
 
 def replacements_to_filters(replacements, pre_filter=None, post_filter=None) -> list:
+    '''
+    Converts repalcements and pre- and post-fitlers
+    into a complete/"final" list of filters.
+    '''
     if not replacements:
         print('WARNING: No replacements supplied!', file=sys.stderr)
     filters = []
@@ -119,6 +137,10 @@ def replacements_to_filters(replacements, pre_filter=None, post_filter=None) -> 
 
 def replace_vars_by_lines_in_stream(fp_in, fp_out, replacements, dry=False,
         verbose=False, pre_filter=None, post_filter=None) -> None:
+    '''
+    Replaces variable keys by their values, one line at a time,
+    reading from one file and writing to an other.
+    '''
     if not replacements:
         print('WARNING: No replacements supplied!', file=sys.stderr)
     filters = replacements_to_filters(replacements, pre_filter, post_filter)

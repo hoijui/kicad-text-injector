@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+'''
+Allows to replace variables of the form `${KEY}` with actual values
+within text fields on KiCad PCB (pcbnew) boards.
+This is most useful for injecting build-specific values when generating output
+(renders, gerbers, ...) in CI builds.
+'''
+
 import re
 import os
 import sys
@@ -30,25 +37,52 @@ filter_kicad_unquote = replace_vars.RegexTextFilter(
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option()
 def kicad_replace_project_vars() -> None:
-    pass
+    '''
+    Stub function for module-global click annotations.
+    '''
 
 def git_remote_to_https_url(url) -> str:
+    '''
+    Converts a common git remote URL
+    into a web-ready (http(s)) URL of the project.
+
+    for example:
+
+    "git@github.com:hoijui/kicad-text-injector.git"
+    ->
+    "https://github.com/hoijui/kicad-text-injector"
+    '''
     public_url = re.sub(r"^git@", "https://", url)
     public_url = public_url.replace(".com:", ".com/", 1)
     public_url = re.sub(r"\.git$", "", public_url)
     return public_url
 
 def isDirtyVersion(vers) -> bool:
+    '''
+    Checks whether a given version string is a git dirty version.
+    Dirty means, there are uncommitted changes.
+    '''
     return R_DIRTY_VERSION.match(vers) # TODO check if correct
 
 def test_isDirtyVersion():
-    assert(not isDirtyVersion('myProj-1.2.3'))
-    assert(not isDirtyVersion('myProj-1.2.3dirty'))
-    assert(not isDirtyVersion('myProj-1.2.3-dirtybroken'))
-    assert(isDirtyVersion('myProj-1.2.3-dirty'))
-    assert(isDirtyVersion('myProj-1.2.3-dirty-broken'))
+    '''
+    Unit test for the function isDirtyVersion.
+    '''
+    assert not isDirtyVersion('myProj-1.2.3')
+    assert not isDirtyVersion('myProj-1.2.3dirty')
+    assert not isDirtyVersion('myProj-1.2.3-dirtybroken')
+    assert isDirtyVersion('myProj-1.2.3-dirty')
+    assert isDirtyVersion('myProj-1.2.3-dirty-broken')
 
 def convertTupleToDict(tpl) -> dict:
+    '''
+    Converts a key-value pair tuple into a dict,
+    for example:
+
+    ((ke1, value1), (key2, value2))
+    ->
+    {key1: value1, key2: value2}
+    '''
     dct = {}
     for key, value in tpl:
         dct[key] = value
@@ -111,9 +145,20 @@ def convertTupleToDict(tpl) -> dict:
 @click.option('--verbose',
         is_flag=True,
         help='Whether to output additional info to stderr')
-def replace_single_command(src, dst, additional_replacements, src_file_path=None, repo_path='.',
-        repo_url=None, name=None, vers=None, version_date=None, build_date=None,
-        date_format=DATE_FORMAT, kicad_pcb=False, dry=False,
+def replace_single_command(
+        src,
+        dst,
+        additional_replacements,
+        src_file_path=None,
+        repo_path='.',
+        repo_url=None,
+        name=None,
+        vers=None,
+        version_date=None,
+        build_date=None,
+        date_format=DATE_FORMAT,
+        kicad_pcb=False,
+        dry=False,
         verbose=False) -> None:
     '''
     Using a KiCad PCB file as input,
@@ -147,11 +192,18 @@ def replace_single_command(src, dst, additional_replacements, src_file_path=None
         build_date,
         date_format,
         verbose)
-    replace_single(src, dst, add_repls_dict, src_file_path, repo_path,
-            kicad_pcb, dry, verbose)
+    replace_single(
+            src,
+            dst,
+            add_repls_dict,
+            src_file_path,
+            repo_path,
+            kicad_pcb,
+            dry,
+            verbose)
 
 def prepare_project_vars(
-        vars: dict,
+        repls: dict,
         repo_path,
         repo_url,
         name,
@@ -179,14 +231,15 @@ def prepare_project_vars(
     if version_date is None:
         version_date = date.fromtimestamp(repo.head.ref.commit.committed_date).strftime(date_format)
     if isDirtyVersion(vers):
-        print(f"WARNING: Dirty project version ('{vers}')! (you have uncommitted changes in your project)")
+        print(f"WARNING: Dirty project version ('{vers}')! ' "
+                + "(you have uncommitted changes in your project)")
     if build_date is None:
         build_date = date.today().strftime(date_format)
-    vars.setdefault('PROJECT_REPO_URL', repo_url)
-    vars.setdefault('PROJECT_NAME', name)
-    vars.setdefault('PROJECT_VERSION', vers)
-    vars.setdefault('PROJECT_VERSION_DATE', version_date)
-    vars.setdefault('PROJECT_BUILD_DATE', build_date)
+    repls.setdefault('PROJECT_REPO_URL', repo_url)
+    repls.setdefault('PROJECT_NAME', name)
+    repls.setdefault('PROJECT_VERSION', vers)
+    repls.setdefault('PROJECT_VERSION_DATE', version_date)
+    repls.setdefault('PROJECT_BUILD_DATE', build_date)
 
 def replace_single(
         src,
@@ -236,9 +289,11 @@ def replace_single(
             pre_filter=pre_filter, post_filter=post_filter)
 
 @click.command(context_settings=CONTEXT_SETTINGS)
-@click.argument("src_root", type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True))
+@click.argument("src_root",
+        type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True))
 @click.argument("glob", type=click.STRING)
-@click.argument("dst_root", type=click.Path(exists=True, dir_okay=True, file_okay=False, writable=True))
+@click.argument("dst_root",
+        type=click.Path(exists=True, dir_okay=True, file_okay=False, writable=True))
 @click.argument("additional_replacements", type=replace_vars.KEY_VALLUE_PAIR, nargs=-1)
 @click.option('--src-file-path', '-p',
         type=click.Path(dir_okay=False, file_okay=True),
@@ -283,7 +338,8 @@ def replace_single(
 @click.option('--date-format',
         type=click.STRING,
         default=DATE_FORMAT,
-        help='The format for the version and the build dates; see pythons date.strftime documentation')
+        help='The format for the version and the build dates; '
+                + 'see pythons date.strftime documentation')
 @click.option('--kicad-pcb',
         is_flag=True,
         help='Whether the filtered file is a *.kicab_pcb')
@@ -293,10 +349,21 @@ def replace_single(
 @click.option('--verbose',
         is_flag=True,
         help='Whether to output additional info to stderr')
-def replace_recursive_command(src_root='.', glob='*.kicad_pcb', dst_root='./build/gen-src',
-        additional_replacements=(), src_file_path=None, repo_path='.',
-        repo_url=None, name=None, vers=None, version_date=None, build_date=None,
-        date_format=DATE_FORMAT, kicad_pcb=False, dry=False,
+def replace_recursive_command(
+        src_root='.',
+        glob='*.kicad_pcb',
+        dst_root='./build/gen-src',
+        additional_replacements=(),
+        src_file_path=None,
+        repo_path='.',
+        repo_url=None,
+        name=None,
+        vers=None,
+        version_date=None,
+        build_date=None,
+        date_format=DATE_FORMAT,
+        kicad_pcb=False,
+        dry=False,
         verbose=False) -> None:
     '''
     Scanns for all *.kicad_pcb files in the SRC_ROOT directory,
@@ -332,13 +399,31 @@ def replace_recursive_command(src_root='.', glob='*.kicad_pcb', dst_root='./buil
         build_date,
         date_format,
         verbose)
-    replace_recursive(src_root, glob, dst_root, add_repls_dict, src_file_path, repo_path,
-            kicad_pcb, dry, verbose)
+    replace_recursive(
+            src_root,
+            glob,
+            dst_root,
+            add_repls_dict,
+            src_file_path,
+            repo_path,
+            kicad_pcb,
+            dry,
+            verbose)
 
-def replace_recursive(src_root='.', glob='*.kicad_pcb', dst_root=None,
-        add_repls_dict={}, src_file_path=None, repo_path='.',
+def replace_recursive(
+        src_root='.',
+        glob='*.kicad_pcb',
+        dst_root=None,
+        add_repls_dict={},
+        src_file_path=None,
+        repo_path='.',
         kicad_pcb=False,
-        dry=False, verbose=False) -> None:
+        dry=False,
+        verbose=False) -> None:
+    '''
+    Recursively scanns a directory for KiCad PCB (pcbnew) files,
+    and replaces variable keys with values in eahc one of them.
+    '''
     if src_root == dst_root:
         dst_root = None
     if verbose:
