@@ -43,7 +43,7 @@ you can install all of this with:
 
 ```bash
 sudo apt-get install bash git python3-pip
-pip install pcb-tools
+pip install -r requirements.txt
 ```
 
 ### Get the tool
@@ -53,9 +53,9 @@ which would be one that supports *\*.kicad_pcb* files,
 you would do this to install this tool (in the project root dir):
 
 ```bash
-pip install pcb-tools
 mkdir -p doc-tools
 git submodule add https://github.com/hoijui/kicad-text-injector.git doc-tools/kicad-text-injector
+pip install -r doc-tools/kicad-text-injector/requirements.txt
 ```
 
 > **NOTE**\
