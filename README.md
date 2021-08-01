@@ -29,7 +29,7 @@ though it can also be run locally.
 * Python 3
 * BASH
 
-## How does it work?
+## How it works
 
 ### Install Prerequisites
 
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 In the repo of your project in which you want to use this tool,
 which would be one that supports *\*.kicad_pcb* files,
-you would do this to install this tool (in the project root dir):
+you would do the following to install this tool (in the project root dir):
 
 ```bash
 mkdir -p doc-tools
@@ -81,5 +81,6 @@ from the post-processed KiCad sources.
 It can generate much more then just Gerbers
 and 2D renders of the PCBs.
 
-Also see the [KiCad image/QRCode injector](https://github.com/hoijui/kicad-image-injector).
+Also see the [KiCad image/QRCode injector](
+https://github.com/hoijui/kicad-image-injector).
 
