@@ -72,6 +72,12 @@ doc-tools/kicad-text-injector/generate_sources
 
 Output can be found under the *build* directory.
 
+### Run Unit-Tests
+
+```bash
+python -m unittest test_*.py
+```
+
 ## Misc
 
 We very warmly recommend you to use
