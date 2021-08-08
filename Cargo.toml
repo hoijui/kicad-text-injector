@@ -20,4 +20,4 @@ edition = "2018"
 clap = "3.0.0-beta.2"
 regex = "1"
 dict = "0.1.5"
-repvar = { path = "../repvar" }
+repvar = { version = "0.1.17", path = "../repvar" }
