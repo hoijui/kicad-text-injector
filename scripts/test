@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
+# Exit immediately on each error and unset variable;
+# see: https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -Eeuo pipefail
+#set -Eeu
+
+#script_dir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+#source "$script_dir/env"
+
+# We run all tests, even if some are failing.
+
+exit=0
+
+cargo test || exit=$?
+
+cargo fmt -- --check || exit=$?
+
+# HACK We disable the `ptr_arg` check, because clippy falsely thinks a Dict can be replaced by a Vec.
+cargo clippy -- \
+  --deny clippy::pedantic \
+  --allow clippy::ptr_arg \
+  || exit=$?
+
+if which reuse
+then
+  reuse lint || exit=$?
+else
+  echo "WARNING: REUSE tool not found; skipping licensing check."
+fi
+
+exit $exit

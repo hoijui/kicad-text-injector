@@ -12,6 +12,18 @@ SPDX-License-Identifier: CC0-1.0
 [![REUSE status](
     https://api.reuse.software/badge/github.com/hoijui/kicad-text-injector)](
     https://api.reuse.software/info/github.com/hoijui/kicad-text-injector)
+[![crates.io](
+    https://img.shields.io/crates/v/kicad-text-injector.svg)](
+    https://crates.io/crates/kicad-text-injector)
+[![Docs](
+    https://docs.rs/kicad-text-injector/badge.svg)](
+    https://docs.rs/kicad-text-injector)
+[![dependency status](
+    https://deps.rs/repo/github/hoijui/kicad-text-injector/status.svg)](
+    https://deps.rs/repo/github/hoijui/kicad-text-injector)
+[![Build status](
+    https://github.com/hoijui/kicad-text-injector/workflows/build/badge.svg)](
+    https://github.com/hoijui/kicad-text-injector/actions)
 
 This tool allows you to post-process your KiCad PCB files,
 by replacing variables of the type `${NAME}` in your text elements.
@@ -24,58 +36,47 @@ This is most useful for filling in project-specific meta-data into the final out
 and thus this tool is primarily targeting CI jobs,
 though it can also be run locally.
 
-## Dependencies
+## How to compile
 
-* Python 3
-* BASH
+You need to install Rust(lang) and Cargo.
 
-## How it works
-
-### Install Prerequisites
-
-* BASH
-* git
-* Python
-* `pcb-tools` (a Python library)
-
-on a regular Debian based Linux,
-you can install all of this with:
+Then you can run:
 
 ```bash
-sudo apt-get install bash git python3-pip
-pip install -r requirements.txt
+scripts/build
 ```
 
-### Get the tool
+## Get the tool
 
-In the repo of your project in which you want to use this tool,
-which would be one that supports *\*.kicad_pcb* files,
-you would do the following to install this tool (in the project root dir):
+As for now, you have two choices:
 
-```bash
-mkdir -p doc-tools
-git submodule add https://github.com/hoijui/kicad-text-injector.git doc-tools/kicad-text-injector
-pip install -r doc-tools/kicad-text-injector/requirements.txt
-```
+1. [Compile it](#how-to-compile) yourself
+1. Download the Linux x86\_64 staticially linked binary from
+   [the releases page](https://github.com/hoijui/kicad-text-injector/releases)
 
-> **NOTE**\
-> There might be a tool to automate this in a more user friendly way,
-> comparable to a package manager like `Oh-My-ZSH` or `apt`.
-
-### Run
-
-This will generate the PCB derived artifacts for all KiCad PCBs in the repo:
+## Usage
 
 ```bash
-doc-tools/kicad-text-injector/generate_sources
-```
+$ kicad-text-injector --help
+Given a KiCad PCB file (*.kicad_pcb) as input, replaces variables of the type `${KEY}` within text
+fields with their respective value.
 
-Output can be found under the *build* directory.
+USAGE:
+    kicad-text-injector [FLAGS] [OPTIONS] --input <input> --output <output>
 
-### Run Unit-Tests
+FLAGS:
+    -e, --env                       use environment variables for substitution in the text
+    -f, --fail-on-missing-values    fail if no value is available for a variable key found in the
+                                    input text
+    -h, --help                      Prints help information
+    -v, --verbose                   more verbose output (useful for debugging)
+    -V, --version                   Prints version information
 
-```bash
-python -m unittest test_*.py
+OPTIONS:
+    -i, --input <input>             the input file to use; '-' for stdin [default: -]
+    -o, --output <output>           the output file to use; '-' for stdout [default: -]
+    -D, --variable <variable>...    a variable key-value pair to be used for substitution in the
+                                    text
 ```
 
 ## Misc
@@ -89,4 +90,3 @@ and 2D renders of the PCBs.
 
 Also see the [KiCad image/QRCode injector](
 https://github.com/hoijui/kicad-image-injector).
-

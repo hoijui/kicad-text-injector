@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
+# Exit immediately on each error and unset variable;
+# see: https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -Eeuo pipefail
+#set -Eeu
+
+script_dir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+source "$script_dir/env"
+
+mkdir -p "$STAGING"
+# mkdir -p "$STAGING"/{complete,doc}
+
+find . -maxdepth 1 \
+    \( \
+    -name "*LICENSE*" -o \
+    -name "*README*" -o \
+    -name "*COPYING*" -o \
+    -name "*AUTHORS*" -o \
+    -name "*FAQ*" -o \
+    -name "*CHANGELOG*" \
+    \) \
+    -exec cp -r {} "$STAGING/" \;
+
+if [ ! -e "$BINARY_PATH" ]
+then
+  {
+    echo "ERROR: Binary ('$BINARY_PATH') does not exist!"
+    echo "       Maybe you forgot to build it (using 'script/build' or 'cargo build --release')?"
+  } >&2
+  exit 1
+fi
+
+cp "$BINARY_PATH" "$STAGING/"
+
+if $IS_WIN
+then
+  7z a "$PACKAGE_ARCHIVE" "$STAGING"
+else
+  # The man page is only generated on Unix systems. ¯\_(ツ)_/¯
+  # if [ -e "$outdir/$binary.1" ]
+  # then
+  #   cp "$outdir/$binary.1" "$staging/doc/"
+  # fi
+  tar czf "$PACKAGE_ARCHIVE" "$STAGING"
+fi

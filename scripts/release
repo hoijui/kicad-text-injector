@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
+# Exit immediately on each error and unset variable;
+# see: https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -Eeuo pipefail
+#set -Eeu
+
+#script_dir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+#source "$script_dir/env"
+
+new_version="${1:-}"
+push="${2:-false}"
+
+if [ -z "${new_version:-}" ]
+then
+  >&2 echo "ERROR: Please supply the new version as first argument to this script; aborting release process!"
+  exit 1
+fi
+
+if [ -n "$(git diff --cached --numstat)" ]
+then
+  >&2 echo "ERROR: There are staged changes in the repo; aborting release process!"
+  exit 2
+fi
+
+# Refreshes the index, so 'git diff-index' will show correct results.
+git update-index --refresh || true > /dev/null
+if git diff-index HEAD -- | grep -q "\sCargo\.\(lock\|toml\)\$"
+then
+  >&2 echo "ERROR: There are changes in Cargo.(toml|lock); aborting release process!"
+  exit 3
+fi
+
+# Set new version in Cargo.toml
+sed -i -e 's|^version[ \t]*=[ \t]*".*"$|version = "'"$new_version"'"|g' "Cargo.toml"
+
+# Set new version in Cargo.lock
+cat "Cargo.lock" | awk -e "
+BEGIN {
+  found = 0
+  replaced = 0
+}
+/^name = \"repvar\"$/ {
+  if (!replaced) {
+    found = 1
+  }
+}
+/^version = \".*\"$/ {
+  if (found) {
+    gsub(\"\\\".*\\\"\", \"\\\"$new_version\\\"\", \$0)
+    replaced = 1
+    found = 0
+  }
+}
+{
+  print(\$0)
+}
+" > "Cargo.lock.tmp"
+mv "Cargo.lock.tmp" "Cargo.lock"
+cat "Cargo.lock" | grep -A 1 "repvar"
+
+git add Cargo.toml Cargo.lock
+git commit -m "Switch our version to $new_version"
+git tag -a -m "Release repvar version $new_version" "$new_version"
+
+if $push
+then
+  git push origin --tags master
+else
+  echo "Ready to release with:"
+  echo "git push origin --tags master"
+fi
