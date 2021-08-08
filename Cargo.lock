@@ -202,6 +202,8 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 [[package]]
 name = "repvar"
 version = "0.1.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9da6b330b4ac11a96f1460b60f0baf547256c23349fa4c63355729ed12f2bb9d"
 dependencies = [
  "clap",
  "dict",
