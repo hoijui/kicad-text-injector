@@ -7,11 +7,11 @@ SPDX-License-Identifier: CC0-1.0
 # KiCad text injector
 
 [![License: GPL-3.0-or-later](
-https://img.shields.io/badge/License-GPL%203.0+-blue.svg)](
-https://www.gnu.org/licenses/gpl-3.0.html)
+    https://img.shields.io/badge/License-GPL%203.0+-blue.svg)](
+    https://www.gnu.org/licenses/gpl-3.0.html)
 [![REUSE status](
-https://api.reuse.software/badge/github.com/hoijui/kicad-text-injector)](
-https://api.reuse.software/info/github.com/hoijui/kicad-text-injector)
+    https://api.reuse.software/badge/github.com/hoijui/kicad-text-injector)](
+    https://api.reuse.software/info/github.com/hoijui/kicad-text-injector)
 
 This tool allows you to post-process your KiCad PCB files,
 by replacing variables of the type `${NAME}` in your text elements.
