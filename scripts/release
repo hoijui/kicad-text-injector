@@ -9,8 +9,8 @@
 set -Eeuo pipefail
 #set -Eeu
 
-#script_dir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
-#source "$script_dir/env"
+script_dir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+source "$script_dir/env"
 
 new_version="${1:-}"
 push="${2:-false}"
@@ -44,7 +44,7 @@ BEGIN {
   found = 0
   replaced = 0
 }
-/^name = \"repvar\"$/ {
+/^name = \"$NAME\"$/ {
   if (!replaced) {
     found = 1
   }
@@ -61,11 +61,11 @@ BEGIN {
 }
 " > "Cargo.lock.tmp"
 mv "Cargo.lock.tmp" "Cargo.lock"
-cat "Cargo.lock" | grep -A 1 "repvar"
+cat "Cargo.lock" | grep -A 1 "$NAME"
 
 git add Cargo.toml Cargo.lock
 git commit -m "Switch our version to $new_version"
-git tag -a -m "Release repvar version $new_version" "$new_version"
+git tag -a -m "Release $NAME version $new_version" "$new_version"
 
 if $push
 then
