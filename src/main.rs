@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+extern crate repvar;
+
 use clap::{crate_authors, crate_version, App, Arg};
-use dict::{Dict, DictIface};
+use std::collections::HashMap;
 use std::env;
 use std::io::Result;
 
@@ -75,7 +77,7 @@ fn main() -> Result<()> {
 
     let verbose: bool = args.is_present("verbose");
 
-    let mut vars = Dict::<String>::new();
+    let mut vars = HashMap::new();
 
     // enlist environment variables
     if args.is_present("environment") {
@@ -88,7 +90,7 @@ fn main() -> Result<()> {
             .values_of_t::<repvar::key_value::Pair>("variable")
             .unwrap_or_else(|e| e.exit())
         {
-            vars.add(kvp.key, kvp.value);
+            vars.insert(kvp.key, kvp.value);
         }
     }
 
@@ -103,15 +105,22 @@ fn main() -> Result<()> {
             println!("OUTPUT: {}", &out_file);
         }
 
-        for var in &vars {
-            println!("VARIABLE: {}={}", var.key, var.val);
+        for (key, value) in &vars {
+            println!("VARIABLE: {}={}", key, value);
         }
         println!();
     }
 
     let mut writer = repvar::tools::create_output_writer(args.value_of("output"))?;
 
-    replacer::replace_in_stream(&vars, args.value_of("input"), &mut writer, fail_on_missing)?;
+    // let settings = &repvar::settings! {vars: Box::new(vars), fail_on_missing: fail_on_missing, verbose: verbose};
+    let settings = repvar::replacer::Settings::builder()
+        .vars(Box::new(vars))
+        .fail_on_missing(fail_on_missing)
+        .verbose(verbose)
+        .build();
+
+    replacer::replace_in_stream(&settings, args.value_of("input"), &mut writer)?;
 
     Ok(())
 }

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use dict::Dict;
 use std::io;
 use std::io::BufRead;
 use std::io::Write;
@@ -22,11 +21,10 @@ use crate::kicad_quoter;
 /// If reading from the input failed.
 ///
 /// If writing to the output failed.
-pub fn replace_in_stream(
-    vars: &Dict<String>,
+pub fn replace_in_stream<S: ::std::hash::BuildHasher>(
+    settings: &repvar::replacer::Settings<S>,
     input: Option<&str>,
     writer: &mut Box<dyn Write>,
-    fail_on_missing: bool,
 ) -> io::Result<()> {
     let reader = repvar::tools::create_input_reader(input)?;
 
@@ -36,8 +34,7 @@ pub fn replace_in_stream(
             match line {
                 Ok(line) => {
                     let quoted = kicad_quoter::quote(&line);
-                    let replaced =
-                        repvar::replacer::replace_in_string(vars, &quoted, fail_on_missing)?;
+                    let replaced = repvar::replacer::replace_in_string(&quoted, settings)?;
                     let unquoted = kicad_quoter::unquote(replaced.as_ref());
                     writer.write_all(unquoted.as_bytes())?;
                     writer.write_all("\n".as_bytes())?;
