@@ -36,7 +36,8 @@ jobs:
         uses: actions/checkout@v2
         if: env.OUR_VERSION == ''
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          submodules: true
       - name: Set the environment variables (including OUR_VERSION)
         shell: bash
         if: env.OUR_VERSION == ''
@@ -96,7 +97,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        fetch-depth: 1
+        fetch-depth: 0
+        submodules: true
 
     - name: Set the environment variables (including OUR_VERSION)
       shell: bash

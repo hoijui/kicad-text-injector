@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Get the Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -31,3 +33,4 @@ jobs:
         run: scripts/build
       - name: Test & Check
         run: scripts/test
+
