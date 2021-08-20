@@ -2,6 +2,39 @@
 #
 # SPDX-License-Identifier: Unlicense
 
+# NOTE We disable this for now, because:
+#
+# # Putting tiny, crappy, rust newb-projects on crates.io?
+# or
+# # How to publish  tiny, crappy, rust newb-projects?
+#
+# ... to not pollute the global name-space.
+#
+# ## Solutions
+#
+# ### Name
+#
+# You can just name them "hoijui-shitty-project1" or something.
+#
+# ### Not on crates.io
+#
+# ... but personally,
+# I wouldn't upload them to crates.io unless I was sure it's something that:
+#
+# a) I want to commit maintaining
+# b) is something other people will find useful.
+#
+# You can still have your project on your github and have people use it easily, see:
+# <https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#specifying-dependencies-from-git-repositories>
+#
+# This also works wih `cargo install`, if it is some command line tool.
+#
+# The only real restriction is,
+# that if other people depend on your github repo,
+# they wouldn't then be able to publish their own stuff on crates.io,
+# because github dependencies aren't allowed there.
+# So you'd probably want to use a license that permits them to fork/copy your code.
+
 name: publish
 on:
   push:
