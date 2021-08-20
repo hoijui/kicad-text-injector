@@ -4,7 +4,7 @@
 
 [package]
 name = "kicad-text-injector"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Robin Vobruba <hoijui.quaero@gmail.com>"]
 description = """
     A tiny CLI tool that replaces variables of the style `${KEY}`
