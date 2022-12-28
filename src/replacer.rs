@@ -37,7 +37,7 @@ pub fn replace_in_stream<S: ::std::hash::BuildHasher>(
                     let replaced = repvar::replacer::replace_in_string(&quoted, settings)?;
                     let unquoted = kicad_quoter::unquote(replaced.as_ref());
                     writer.write_all(unquoted.as_bytes())?;
-                    writer.write_all("\n".as_bytes())?;
+                    writer.write_all(b"\n")?;
                     Ok(())
                 }
                 Err(err) => Err(err),
