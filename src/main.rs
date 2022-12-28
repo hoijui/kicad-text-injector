@@ -30,7 +30,8 @@
 
 extern crate repvar;
 
-use clap::{crate_authors, crate_version, App, Arg};
+use clap::{self, command, Arg, ArgAction, ValueHint};
+use repvar::key_value::PairBuf;
 use std::collections::HashMap;
 use std::env;
 use std::io::Result;
@@ -39,95 +40,88 @@ mod kicad_quoter;
 mod replacer;
 
 fn main() -> Result<()> {
-    let args = App::new("kicad-text-injector")
+    let args = command!()
+        .name(clap::crate_name!())
         .about("Given a KiCad PCB file (*.kicad_pcb) as input, replaces variables of the type `${KEY}` within text fields with their respective value.")
-        .version(crate_version!())
-        .author(crate_authors!())
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
         .arg(
             Arg::new("input")
-                .about("the input file to use; '-' for stdin")
-                .takes_value(true)
+                .help("the input file to use; '-' for stdin")
+                .num_args(0..1)
                 .short('i')
                 .long("input")
-                .multiple_occurrences(false)
                 .default_value("-")
+                .action(ArgAction::Set)
                 .required(true)
         )
         .arg(
             Arg::new("output")
-                .about("the output file to use; '-' for stdout")
-                .takes_value(true)
+                .help("the output file to use; '-' for stdout")
+                .num_args(0..1)
                 .short('o')
                 .long("output")
-                .multiple_occurrences(false)
                 .default_value("-")
+                .action(ArgAction::Set)
                 .required(true)
         )
         .arg(
             Arg::new("variable")
-                .about("a variable key-value pair to be used for substitution in the text")
-                .takes_value(true)
+                .help("a variable key-value pair to be used for substitution in the text")
                 .short('D')
                 .long("variable")
-                .multiple_occurrences(true)
-                .required(false)
+                .value_parser(PairBuf::parse)
+                .value_hint(ValueHint::Other)
+                .value_name("KEY=VALUE")
+                .action(ArgAction::Append)
         )
         .arg(
             Arg::new("environment")
-                .about("use environment variables for substitution in the text")
-                .takes_value(false)
+                .help("use environment variables for substitution in the text")
                 .short('e')
                 .long("env")
-                .multiple_occurrences(false)
-                .required(false)
+                .action(ArgAction::SetTrue)
         )
         .arg(
             Arg::new("verbose")
-                .about("more verbose output (useful for debugging)")
-                .takes_value(false)
+                .help("more verbose output (useful for debugging)")
                 .short('v')
                 .long("verbose")
-                .multiple_occurrences(false)
-                .required(false)
+                .action(ArgAction::SetTrue)
         )
         .arg(
             Arg::new("fail-on-missing-values")
-                .about("fail if no value is available for a variable key found in the input text")
-                .takes_value(false)
+                .help("fail if no value is available for a variable key found in the input text")
                 .short('f')
                 .long("fail-on-missing-values")
-                .multiple_occurrences(false)
-                .required(false)
+                .action(ArgAction::SetTrue)
         )
         .get_matches();
 
-    let verbose: bool = args.is_present("verbose");
+    let verbose = args.get_flag("verbose");
 
     let mut vars = HashMap::new();
 
     // enlist environment variables
-    if args.is_present("environment") {
+    if args.get_flag("environment") {
         repvar::tools::append_env(&mut vars);
     }
 
     // enlist variables provided on the CLI
-    if args.occurrences_of("variable") > 0 {
-        for kvp in args
-            .values_of_t::<repvar::key_value::Pair>("variable")
-            .unwrap_or_else(|e| e.exit())
-        {
-            vars.insert(kvp.key, kvp.value);
+    if let Some(kvps) = args.get_many::<PairBuf>("variable") {
+        for kvp in kvps {
+            vars.insert(kvp.key.to_owned(), kvp.value.to_owned());
         }
     }
 
-    let fail_on_missing: bool = args.is_present("fail-on-missing-values");
+    let fail_on_missing = args.get_flag("fail-on-missing-values");
 
     if verbose {
         println!();
-        if let Some(in_file) = args.value_of("input") {
+        if let Some(in_file) = args.get_one::<String>("input") {
             println!("INPUT: {}", &in_file);
         }
-        if let Some(out_file) = args.value_of("output") {
+        if let Some(out_file) = args.get_one::<String>("output") {
             println!("OUTPUT: {}", &out_file);
         }
 
@@ -137,16 +131,16 @@ fn main() -> Result<()> {
         println!();
     }
 
-    let mut writer = repvar::tools::create_output_writer(args.value_of("output"))?;
+    let mut writer = repvar::tools::create_output_writer(args.get_one("output").copied())?;
 
     // let settings = &repvar::settings! {vars: Box::new(vars), fail_on_missing: fail_on_missing, verbose: verbose};
     let settings = repvar::replacer::Settings::builder()
-        .vars(Box::new(vars))
+        .vars(vars)
         .fail_on_missing(fail_on_missing)
         .verbose(verbose)
         .build();
 
-    replacer::replace_in_stream(&settings, args.value_of("input"), &mut writer)?;
+    replacer::replace_in_stream(&settings, args.get_one("input").copied(), &mut writer)?;
 
     Ok(())
 }

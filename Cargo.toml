@@ -17,6 +17,7 @@ categories = ["command-line-utilities", "text-processing"]
 edition = "2021"
 
 [dependencies]
-clap = "3.0.0-beta.2"
+clap = { version = "4.0", features = ["cargo"] }
+lazy_static = "1.4"
 regex = "1"
-repvar = { git = "https://github.com/hoijui/repvar.git" }
+repvar = { version = "0.9.0", git = "https://github.com/hoijui/repvar.git" }
