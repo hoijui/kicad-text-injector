@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+# SPDX-FileCopyrightText: 2021-2022 Robin Vobruba <hoijui.quaero@gmail.com>
 #
 # SPDX-License-Identifier: Unlicense
 
@@ -20,10 +20,12 @@
 # This file was copied from the ripgrep project, and then adjusted
 
 name: release
+
 on:
   push:
     tags:
     - "[0-9]+.[0-9]+.[0-9]+"
+
 jobs:
   create-release:
     name: create-release
@@ -33,23 +35,25 @@ jobs:
       our_version: ${{ env.OUR_VERSION }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: env.OUR_VERSION == ''
         with:
           fetch-depth: 0
           submodules: true
+
+      - name: "Install STOML (BASH TOML parser)"
+        run: scripts/install_stoml
+
       - name: Set the environment variables (including OUR_VERSION)
         shell: bash
         if: env.OUR_VERSION == ''
         run: scripts/env
+
       - name: Create GitHub release
         id: release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.OUR_VERSION }}
-          release_name: ${{ env.OUR_VERSION }}
+          name: ${{ env.OUR_VERSION }}
 
   build-release:
     name: build-release
@@ -62,14 +66,13 @@ jobs:
       # systems.
       CARGO: cargo
       # When CARGO is set to CROSS, this is set to `--target matrix.target`.
-      TARGET_FLAGS: ""
     strategy:
       matrix:
         # build: [linux, linux-arm, macos, win-msvc, win-gnu, win32-msvc]
         build: [linux]
         include:
         - build: linux
-          os: ubuntu-18.04
+          os: ubuntu-20.04
           rust: nightly
           target: x86_64-unknown-linux-musl
         # - build: linux-arm
@@ -95,10 +98,14 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         submodules: true
+
+    - name: "Install STOML (BASH TOML parser)"
+      run: |
+        scripts/install_stoml
 
     - name: Set the environment variables (including OUR_VERSION)
       shell: bash
@@ -106,10 +113,9 @@ jobs:
       run: scripts/env
 
     - name: Install packages (Ubuntu)
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-20.04'
       run: |
-        # ci/ubuntu-install-packages
-        scripts/install-dependencies-ubuntu
+        scripts/install_deps_ubuntu
 
     # - name: Install packages (macOS)
     #   if: matrix.os == 'macos-latest'
@@ -117,11 +123,9 @@ jobs:
     #     ci/macos-install-packages
 
     - name: Install Rust
-      uses: actions-rs/toolchain@v1
+      uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ matrix.rust }}
-        profile: minimal
-        override: true
         target: ${{ matrix.target }}
 
     # - name: Use Cross
@@ -129,17 +133,17 @@ jobs:
     #   run: |
     #     cargo install cross
     #     echo "CARGO=cross" >> $GITHUB_ENV
-    #     echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
+    #     echo "TARGET_FLAG=--target ${{ matrix.target }}" >> $GITHUB_ENV
     #     echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
 
     - name: Show command used for Cargo
       run: |
         echo "cargo command is: ${{ env.CARGO }}"
-        echo "target flag is: ${{ env.TARGET_FLAGS }}"
+        echo "target flag is: ${{ matrix.target }}"
         echo "target dir is: ${{ env.TARGET_DIR }}"
 
     - name: Build and strip release binary
-      run: scripts/build
+      run: scripts/build --skip-strip
 
     # - name: Strip release binary (linux and macos)
     #   if: matrix.build == 'linux' || matrix.build == 'macos'

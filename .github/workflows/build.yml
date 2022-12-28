@@ -1,36 +1,50 @@
-# SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+# SPDX-FileCopyrightText: 2021-2022 Robin Vobruba <hoijui.quaero@gmail.com>
 #
 # SPDX-License-Identifier: Unlicense
 
 name: build
+
 on:
   push:
-    branches: [ master ]
+    branches: [ master, develop ]
     paths:
       - 'src/**'
+      - 'tests/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+      - 'scripts/build'
+      - '.github/workflows/build.yml'
   release:
     types: [ published ]
+
+env:
+  RUST_BACKTRACE: 1
+
 jobs:
   push_to_registry:
     name: Compile
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
+      - name: "Check out the repo"
+        uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Get the Rust toolchain
-        uses: actions-rs/toolchain@v1
+
+      - name: "Install STOML (BASH TOML parser)"
+        run: scripts/install_stoml
+
+      - name: "Get the Rust toolchain"
+        uses: dtolnay/rust-toolchain@stable
         with:
-            toolchain: stable
-            override: true
+            targets: x86_64-unknown-linux-musl
             components: rustfmt, clippy
-      # Smart caching for rust/cargo projects with sensible defaults.
-      - uses: Swatinem/rust-cache@v1
-      - name: Build
+
+      - name: "Smart caching for rust/cargo"
+        uses: Swatinem/rust-cache@v2
+
+      - name: "Build"
         run: scripts/build
-      - name: Test & Check
+
+      - name: "Test & Check"
         run: scripts/test
 
