@@ -31,6 +31,7 @@
 extern crate repvar;
 
 use clap::{self, command, Arg, ArgAction, ValueHint};
+use const_format::formatcp;
 use repvar::key_value::PairBuf;
 use std::collections::HashMap;
 use std::env;
@@ -39,12 +40,52 @@ use std::io::Result;
 mod kicad_quoter;
 mod replacer;
 
+const A_L_VERSION: &str = "version";
+const A_S_VERSION: char = 'V';
+const A_S_QUIET: char = 'q';
+const A_L_QUIET: &str = "quiet";
+
+fn arg_version() -> Arg {
+    Arg::new(A_L_VERSION)
+        .help(formatcp!(
+            "Print version information and exit. \
+May be combined with -{A_S_QUIET},--{A_L_QUIET}, \
+to really only output the version string."
+        ))
+        .short(A_S_VERSION)
+        .long(A_L_VERSION)
+        .action(ArgAction::SetTrue)
+}
+
+fn arg_quiet() -> Arg {
+    Arg::new(A_L_QUIET)
+        .help("Minimize or suppress output to stdout")
+        .long_help("Minimize or suppress output to stdout, and only shows log output on stderr.")
+        .action(ArgAction::SetTrue)
+        .short(A_S_QUIET)
+        .long(A_L_QUIET)
+}
+
+fn print_version_and_exit(quiet: bool) {
+    #![allow(clippy::print_stdout)]
+
+    if !quiet {
+        print!("{} ", clap::crate_name!());
+    }
+    println!("{}", kicad_text_injector::VERSION);
+    std::process::exit(0);
+}
+
 fn main() -> Result<()> {
     let args = command!()
         .name(clap::crate_name!())
         .about("Given a KiCad PCB file (*.kicad_pcb) as input, replaces variables of the type `${KEY}` within text fields with their respective value.")
         .version(clap::crate_version!())
         .author(clap::crate_authors!())
+        .help_expected(true)
+        .disable_version_flag(true)
+        .arg(arg_version())
+        .arg(arg_quiet())
         .arg(
             Arg::new("input")
                 .help("the input file to use; '-' for stdin")
@@ -95,6 +136,12 @@ fn main() -> Result<()> {
                 .action(ArgAction::SetTrue)
         )
         .get_matches();
+
+    let quiet = args.get_flag(A_L_QUIET);
+    let version = args.get_flag(A_L_VERSION);
+    if version {
+        print_version_and_exit(quiet);
+    }
 
     let verbose = args.get_flag("verbose");
 

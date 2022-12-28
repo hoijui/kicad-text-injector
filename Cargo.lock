@@ -150,6 +150,8 @@ name = "kicad-text-injector"
 version = "0.2.4"
 dependencies = [
  "clap",
+ "const_format",
+ "git-version",
  "lazy_static",
  "regex",
  "repvar",
