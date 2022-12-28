@@ -106,7 +106,7 @@ fn main() -> Result<()> {
         }
 
         for (key, value) in &vars {
-            println!("VARIABLE: {}={}", key, value);
+            println!("VARIABLE: {key}={value}");
         }
         println!();
     }
