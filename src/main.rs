@@ -53,7 +53,6 @@ fn main() -> Result<()> {
                 .long("input")
                 .default_value("-")
                 .action(ArgAction::Set)
-                .required(true)
         )
         .arg(
             Arg::new("output")
@@ -63,7 +62,6 @@ fn main() -> Result<()> {
                 .long("output")
                 .default_value("-")
                 .action(ArgAction::Set)
-                .required(true)
         )
         .arg(
             Arg::new("variable")
