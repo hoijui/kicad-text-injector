@@ -108,7 +108,7 @@ fn main() -> Result<()> {
     // enlist variables provided on the CLI
     if let Some(kvps) = args.get_many::<PairBuf>("variable") {
         for kvp in kvps {
-            vars.insert(kvp.key.to_owned(), kvp.value.to_owned());
+            vars.insert(kvp.key.clone(), kvp.value.clone());
         }
     }
 
