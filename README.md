@@ -97,3 +97,13 @@ and 2D renders of the PCBs.
 
 Also see the [KiCad image/QRCode injector](
 https://github.com/hoijui/kicad-image-injector).
+
+## Funding
+
+This project was funded by the European Regional Development Fund (ERDF)
+in the context of the [INTERFACER Project](https://www.interfacerproject.eu/),
+from July 2021
+until March 2023.
+
+![Logo of the EU ERDF program](
+    https://cloud.fabcity.hamburg/s/TopenKEHkWJ8j5P/download/logo-eu-erdf.png)
