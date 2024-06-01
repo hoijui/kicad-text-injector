@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021-20232 Robin Vobruba <hoijui.quaero@gmail.com>
+# SPDX-FileCopyrightText: 2021 - 2024 Robin Vobruba <hoijui.quaero@gmail.com>
 #
 # SPDX-License-Identifier: Unlicense
 
@@ -12,8 +12,10 @@ description = """
     """
 license = "GPL-3.0-or-later"
 repository = "https://github.com/hoijui/kicad-text-injector"
+homepage = "https://github.com/hoijui/kicad-text-injector"
 keywords = ["cli", "ci", "kicad"]
 categories = ["command-line-utilities", "text-processing"]
+readme = "README.md"
 edition = "2021"
 
 [lints.rust]
