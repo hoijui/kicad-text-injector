@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+// SPDX-FileCopyrightText: 2021 - 2024 Robin Vobruba <hoijui.quaero@gmail.com>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,4 +13,4 @@ use git_version::git_version;
 #[cfg(doctest)]
 pub struct ReadmeDoctests;
 
-pub const VERSION: &str = git_version!();
+pub const VERSION: &str = git_version!(cargo_prefix = "", fallback = "unknown");
