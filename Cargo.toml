@@ -31,14 +31,14 @@ string_slice = "warn"
 indexing_slicing = "warn"
 clone_on_ref_ptr = "warn"
 try_err = "warn"
-shadow_reuse = "allow"
+shadow_reuse = "warn"
 empty_structs_with_brackets = "warn"
 else_if_without_else = "warn"
 use_debug = "warn"
 print_stdout = "warn"
 print_stderr = "warn"
 #default_trait_access = "allow"
-option_if_let_else = "allow"
+option_if_let_else = "warn"
 
 [dependencies]
 clap = { version = "4.5", features = ["cargo", "derive"] }
