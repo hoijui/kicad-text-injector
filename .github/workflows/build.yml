@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021-2022 Robin Vobruba <hoijui.quaero@gmail.com>
+# SPDX-FileCopyrightText: 2021 - 2024 Robin Vobruba <hoijui.quaero@gmail.com>
 #
 # SPDX-License-Identifier: Unlicense
 
@@ -28,6 +28,10 @@ jobs:
       - name: "Check out the repo"
         uses: actions/checkout@v3
         with:
+          # This makes sure we also get tags,
+          # so we get the correct version; see bug:
+          # https://github.com/actions/checkout/issues/701
+          fetch-depth: 0
           submodules: true
 
       - name: "Install STOML (BASH TOML parser)"
@@ -43,6 +47,12 @@ jobs:
       - name: "Install the REUSE tool"
         run: pip install reuse
 
+      - name: "Install musl-gcc"
+        # This is required, because we depend on system libraries
+        # like libz, which need to be compiled for MUSL with musl-gcc,
+        # which is part of musl-tools.
+        run: sudo apt install -y musl-tools
+
       - name: "Get the Rust toolchain"
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -51,6 +61,9 @@ jobs:
 
       - name: "Smart caching for rust/cargo"
         uses: Swatinem/rust-cache@v2
+
+      - name: "Install STOML (BASH TOML parser) *again*, because the cache recreation above might have removed it"
+        run: scripts/install_stoml
 
       - name: "Build"
         run: scripts/build
