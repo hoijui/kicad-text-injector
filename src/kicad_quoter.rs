@@ -26,7 +26,7 @@ pub fn unquote(input: &str) -> Cow<'_, str> {
         )
         .unwrap();
     }
-    PCBNEW_TEXT_UNQUOTE.replace_all(input, r#"$pre$text$post"#)
+    PCBNEW_TEXT_UNQUOTE.replace_all(input, r"$pre$text$post")
 }
 
 #[cfg(test)]
