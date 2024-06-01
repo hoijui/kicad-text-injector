@@ -45,6 +45,6 @@ clap = { version = "4.5", features = ["cargo", "derive"] }
 cli_utils = { version = "0.7", package = "cli_utils_hoijui" }
 const_format = "0.2"
 git-version = "0.3"
-lazy_static = "1.4"
+once_cell = "1.19"
 regex = "1.10"
 repvar = "0.13"

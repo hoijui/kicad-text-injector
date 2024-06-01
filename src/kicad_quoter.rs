@@ -1,31 +1,32 @@
-// SPDX-FileCopyrightText: 2021 Robin Vobruba <hoijui.quaero@gmail.com>
+// SPDX-FileCopyrightText: 2021 - 2024 Robin Vobruba <hoijui.quaero@gmail.com>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
 #[must_use]
 pub fn quote(input: &str) -> Cow<'_, str> {
-    lazy_static! {
-        static ref PCBNEW_TEXT_QUOTE: Regex = Regex::new(
-            r#"(?P<pre>\((gr_text|fp_text\s+[a-z]+)\s+)(?P<text>[^"\s]*\$\{[-_0-9a-zA-Z]*\}[^\s"]*)"#
-            // r#"(?P<pre>\((gr_text|fp_text\s+[a-z]+)\s+)(?P<text>[^"\s]*\$\{[-_0-9a-zA-Z]*\}[^\s"]*)(?P<post>\s+[\)\(])"#
-        ).unwrap();
-    }
+    static PCBNEW_TEXT_QUOTE: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(
+            r#"(?P<pre>\((gr_text|fp_text\s+[a-z]+)\s+)(?P<text>[^"\s]*\$\{[-_0-9a-zA-Z]*\}[^\s"]*)"#,
+            //r#"(?P<pre>\((gr_text|fp_text\s+[a-z]+)\s+)(?P<text>[^"\s]*\$\{[-_0-9a-zA-Z]*\}[^\s"]*)(?P<post>\s+[\)\(])"#
+        )
+        .unwrap()
+    });
     PCBNEW_TEXT_QUOTE.replace_all(input, r#"$pre"$text""#)
     // PCBNEW_TEXT_QUOTE.replace_all(input, r#"$pre"$text"$post"#)
 }
 
 #[must_use]
 pub fn unquote(input: &str) -> Cow<'_, str> {
-    lazy_static! {
-        static ref PCBNEW_TEXT_UNQUOTE: Regex = Regex::new(
-            r#"(?P<pre>\((gr_text|fp_text\s+[a-z]+)\s+)"(?P<text>[^"\s\\]+)"(?P<post>\s+[\)\(])"#
+    static PCBNEW_TEXT_UNQUOTE: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(
+            r#"(?P<pre>\((gr_text|fp_text\s+[a-z]+)\s+)"(?P<text>[^"\s\\]+)"(?P<post>\s+[\)\(])"#,
         )
-        .unwrap();
-    }
+        .unwrap()
+    });
     PCBNEW_TEXT_UNQUOTE.replace_all(input, r"$pre$text$post")
 }
 

@@ -200,7 +200,7 @@ dependencies = [
  "cli_utils_hoijui",
  "const_format",
  "git-version",
- "lazy_static",
+ "once_cell",
  "regex",
  "repvar",
 ]
