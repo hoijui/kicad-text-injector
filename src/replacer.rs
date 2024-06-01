@@ -6,6 +6,8 @@ use std::io;
 use std::io::BufRead;
 use std::io::Write;
 
+use cli_utils::create_input_reader;
+
 use crate::kicad_quoter;
 
 /// Replaces all occurences of variables of the form `${KEY}` -
@@ -26,7 +28,7 @@ pub fn replace_in_stream<S: ::std::hash::BuildHasher>(
     input: Option<&str>,
     writer: &mut Box<dyn Write>,
 ) -> io::Result<()> {
-    let reader = repvar::tools::create_input_reader(input)?;
+    let reader = create_input_reader(input)?;
 
     reader
         .lines()

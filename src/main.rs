@@ -31,6 +31,7 @@
 extern crate repvar;
 
 use clap::{self, command, Arg, ArgAction, ValueHint};
+use cli_utils::create_output_writer;
 use const_format::formatcp;
 use repvar::key_value::PairBuf;
 use std::collections::HashMap;
@@ -176,13 +177,12 @@ fn main() -> Result<()> {
         println!();
     }
 
-    let mut writer = repvar::tools::create_output_writer(args.get_one("output").copied())?;
+    let mut writer = create_output_writer(args.get_one::<String>("output"))?;
 
     // let settings = &repvar::settings! {vars: Box::new(vars), fail_on_missing: fail_on_missing, verbose: verbose};
     let settings = repvar::replacer::Settings::builder()
         .vars(vars)
         .fail_on_missing(fail_on_missing)
-        .verbose(verbose)
         .build();
 
     replacer::replace_in_stream(&settings, args.get_one("input").copied(), &mut writer)?;
