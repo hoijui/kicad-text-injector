@@ -32,8 +32,8 @@ pub fn replace_in_stream<S: ::std::hash::BuildHasher>(
 
     reader
         .lines()
-        .map(|line| -> io::Result<()> {
-            match line {
+        .map(|line_res| -> io::Result<()> {
+            match line_res {
                 Ok(line) => {
                     let quoted = kicad_quoter::quote(&line);
                     let replaced = repvar::replacer::replace_in_string(&quoted, settings)?;
