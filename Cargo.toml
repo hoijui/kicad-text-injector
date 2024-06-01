@@ -16,6 +16,28 @@ keywords = ["cli", "ci", "kicad"]
 categories = ["command-line-utilities", "text-processing"]
 edition = "2021"
 
+[lints.rust]
+rust_2021_compatibility = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+wildcard_enum_match_arm = "warn"
+string_slice = "warn"
+indexing_slicing = "warn"
+clone_on_ref_ptr = "warn"
+try_err = "warn"
+shadow_reuse = "allow"
+empty_structs_with_brackets = "warn"
+else_if_without_else = "warn"
+use_debug = "warn"
+print_stdout = "warn"
+print_stderr = "warn"
+#default_trait_access = "allow"
+option_if_let_else = "allow"
+
 [dependencies]
 clap = { version = "4.0", features = ["cargo"] }
 cli_utils = { version = "0.7", package = "cli_utils_hoijui" }
