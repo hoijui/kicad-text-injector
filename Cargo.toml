@@ -41,7 +41,7 @@ print_stderr = "warn"
 option_if_let_else = "allow"
 
 [dependencies]
-clap = { version = "4.0", features = ["cargo"] }
+clap = { version = "4.5", features = ["cargo", "derive"] }
 cli_utils = { version = "0.7", package = "cli_utils_hoijui" }
 const_format = "0.2"
 git-version = "0.3"
