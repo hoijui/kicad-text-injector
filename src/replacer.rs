@@ -10,7 +10,7 @@ use cli_utils::create_input_reader;
 
 use crate::kicad_quoter;
 
-/// Replaces all occurences of variables of the form `${KEY}` -
+/// Replaces all occurrences of variables of the form `${KEY}` -
 /// in a KiCad file supplied as an input stream -
 /// with their respective values.
 ///
