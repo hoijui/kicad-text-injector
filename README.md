@@ -63,7 +63,7 @@ As for now, you have two choices:
 
 ## Usage
 
-```bash
+```text
 $ kicad-text-injector --help
 Given a KiCad PCB file (*.kicad_pcb) as input, replaces variables of the type `${KEY}` within text
 fields with their respective value.
