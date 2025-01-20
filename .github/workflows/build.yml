@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 - 2024 Robin Vobruba <hoijui.quaero@gmail.com>
+# SPDX-FileCopyrightText: 2021 - 2025 Robin Vobruba <hoijui.quaero@gmail.com>
 #
 # SPDX-License-Identifier: Unlicense
 
@@ -12,7 +12,7 @@ on:
       - 'tests/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
-      - 'scripts/build'
+      - 'run/rp/build'
       - '.github/workflows/build.yml'
   release:
     types: [ published ]
@@ -35,7 +35,7 @@ jobs:
           submodules: true
 
       - name: "Install STOML (BASH TOML parser)"
-        run: scripts/install_stoml
+        run: run/rp/install_stoml
 
       - name: "Setup Python 3"
         uses: actions/setup-python@v4
@@ -63,11 +63,11 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: "Install STOML (BASH TOML parser) *again*, because the cache recreation above might have removed it"
-        run: scripts/install_stoml
+        run: run/rp/install_stoml
 
       - name: "Build"
-        run: scripts/build
+        run: run/rp/build
 
       - name: "Test & Check"
-        run: scripts/test
+        run: run/rp/test
 

@@ -1,7 +1,7 @@
 # KiCad text injector
 
 <!--
-SPDX-FileCopyrightText: 2021-2023 Robin Vobruba <hoijui.quaero@gmail.com>
+SPDX-FileCopyrightText: 2021-2025 Robin Vobruba <hoijui.quaero@gmail.com>
 
 SPDX-License-Identifier: CC0-1.0
 -->
@@ -50,7 +50,7 @@ You need to install Rust(lang) and Cargo.
 Then you can run:
 
 ```bash
-scripts/build
+run/rp/build
 ```
 
 ## Get the tool
