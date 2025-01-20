@@ -5,6 +5,7 @@
 use std::io;
 use std::io::BufRead;
 use std::io::Write;
+use std::path::Path;
 
 use cli_utils::create_input_reader;
 
@@ -23,9 +24,9 @@ use crate::kicad_quoter;
 /// If reading from the input failed.
 ///
 /// If writing to the output failed.
-pub fn replace_in_stream<S: ::std::hash::BuildHasher>(
+pub fn replace_in_stream<P: AsRef<Path>, S: ::std::hash::BuildHasher>(
     settings: &repvar::replacer::Settings<S>,
-    input: Option<&str>,
+    input: Option<P>,
     writer: &mut Box<dyn Write>,
 ) -> io::Result<()> {
     let reader = create_input_reader(input)?;
