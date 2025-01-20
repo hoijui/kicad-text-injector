@@ -62,7 +62,7 @@ fn main() -> Result<()> {
         .arg(
             Arg::new("input")
                 .help("the input file to use; '-' for stdin")
-                .num_args(0..1)
+                .num_args(1)
                 .short('i')
                 .long("input")
                 .default_value("-")
@@ -71,7 +71,7 @@ fn main() -> Result<()> {
         .arg(
             Arg::new("output")
                 .help("the output file to use; '-' for stdout")
-                .num_args(0..1)
+                .num_args(1)
                 .short('o')
                 .long("output")
                 .default_value("-")
@@ -157,7 +157,7 @@ fn main() -> Result<()> {
         .fail_on_missing(fail_on_missing)
         .build();
 
-    replacer::replace_in_stream(&settings, args.get_one("input").copied(), &mut writer)?;
+    replacer::replace_in_stream(&settings, args.get_one::<String>("input"), &mut writer)?;
 
     Ok(())
 }
