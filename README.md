@@ -58,7 +58,7 @@ scripts/build
 As for now, you have two choices:
 
 1. [Compile it](#how-to-compile) yourself
-1. Download the Linux x86\_64 staticially linked binary from
+1. Download the Linux x86\_64 statically linked binary from
    [the releases page](https://github.com/hoijui/kicad-text-injector/releases)
 
 ## Usage
